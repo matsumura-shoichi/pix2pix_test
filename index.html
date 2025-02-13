@@ -43,4 +43,62 @@
     </div>
     
     <div id="map">
- 
+        <div id="left-map" class="left">
+            <div class="map-title">pix2pixによる着色</div>
+        </div>
+        <div id="right-map" class="right">
+            <div class="map-title">地理院地図</div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var leftMap = L.map('left-map', { zoomControl: false }).setView([35.599846, 139.502892], 17);
+        var rightMap = L.map('right-map', { zoomControl: false }).setView([35.599846, 139.502892], 17);
+
+        var tileLayers = {
+            'old10': L.tileLayer('https://matsumura-shoichi.github.io/pix2pix_test/tiles/old10/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 17 }),
+            'gazo1': L.tileLayer('https://matsumura-shoichi.github.io/pix2pix_test/tiles/gazo1/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 17 }),
+            'gazo2': L.tileLayer('https://matsumura-shoichi.github.io/pix2pix_test/tiles/gazo2/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 17 }),
+            'gazo3': L.tileLayer('https://matsumura-shoichi.github.io/pix2pix_test/tiles/gazo3/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 17 }),
+            'gazo4': L.tileLayer('https://matsumura-shoichi.github.io/pix2pix_test/tiles/gazo4/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 17 }),
+            'seamless': L.tileLayer('https://matsumura-shoichi.github.io/pix2pix_test/tiles/seamless/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 17 })
+        };
+
+        var gsiLayers = {
+            'old10': L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort_old10/{z}/{x}/{y}.png', { maxZoom: 17, minZoom: 17 }),
+            'gazo1': L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/gazo1/{z}/{x}/{y}.jpg', { maxZoom: 17, minZoom: 17 }),
+            'gazo2': L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/gazo2/{z}/{x}/{y}.jpg', { maxZoom: 17, minZoom: 17 }),
+            'gazo3': L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/gazo3/{z}/{x}/{y}.jpg', { maxZoom: 17, minZoom: 17 }),
+            'gazo4': L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/gazo4/{z}/{x}/{y}.jpg', { maxZoom: 17, minZoom: 17 }),
+            'seamless': L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg', { maxZoom: 17, minZoom: 17 })
+        };
+
+        var currentLeftLayer = tileLayers['old10'];
+        var currentRightLayer = gsiLayers['old10'];
+        currentLeftLayer.addTo(leftMap);
+        currentRightLayer.addTo(rightMap);
+
+        document.querySelectorAll('input[name="tileLayer"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                leftMap.removeLayer(currentLeftLayer);
+                rightMap.removeLayer(currentRightLayer);
+                currentLeftLayer = tileLayers[this.value];
+                currentRightLayer = gsiLayers[this.value];
+                currentLeftLayer.addTo(leftMap);
+                currentRightLayer.addTo(rightMap);
+            });
+        });
+
+        function syncMaps(source, target) {
+            source.on('moveend', function() {
+                target.setView(source.getCenter(), source.getZoom());
+            });
+        }
+
+        syncMaps(leftMap, rightMap);
+        syncMaps(rightMap, leftMap);
+    </script>
+</body>
+</html>
+
