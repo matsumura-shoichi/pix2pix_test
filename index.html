@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -91,8 +91,13 @@
         });
 
         function syncMaps(source, target) {
-            source.on('moveend', function() {
-                target.setView(source.getCenter(), source.getZoom());
+            let moving = false;
+            source.on('move', function() {
+                if (!moving) {
+                    moving = true;
+                    target.setView(source.getCenter(), source.getZoom(), { animate: false });
+                    moving = false;
+                }
             });
         }
 
@@ -101,4 +106,3 @@
     </script>
 </body>
 </html>
-
